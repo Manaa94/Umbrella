@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from weather.models import City
 from django.views.generic import View
 from django.contrib.auth.views import LoginView
-from django.views.generic import CreateView, UpdateView
+from django.views.generic import CreateView, UpdateView, ListView
 from weather.forms import SignUpForm, CityForm, UserForm
 from django.contrib.auth import logout
 from .utils import get_data
@@ -78,3 +78,20 @@ class UpdateUserView(UpdateView):
 
     def get_success_url(self):
         return reverse('weather:profile')
+
+
+# User search history
+class HistoryView(ListView):
+    template_name = 'profile.html'
+    model = User
+    paginate_by = 10
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['history'] = 'history'
+        context['form'] = CityForm()
+        return context
+
+    def get_queryset(self):
+        user = User.objects.get(pk=self.kwargs['pk'])
+        return user.cities.order_by('-searched_at')
