@@ -1,10 +1,11 @@
 from django.urls import reverse
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect, render
+from django.contrib.auth.models import User
 from weather.models import City
 from django.views.generic import View
 from django.contrib.auth.views import LoginView
-from django.views.generic import CreateView
-from weather.forms import SignUpForm, CityForm
+from django.views.generic import CreateView, UpdateView
+from weather.forms import SignUpForm, CityForm, UserForm
 from django.contrib.auth import logout
 from .utils import get_data
 from dotenv import load_dotenv
@@ -68,3 +69,12 @@ class LogoutUserView(View):
     def get(self, request):
         logout(request)
         return redirect('weather:login')
+
+
+class UpdateUserView(UpdateView):
+    template_name = 'edit.html'
+    form_class = UserForm
+    queryset = User.objects.all()
+
+    def get_success_url(self):
+        return reverse('weather:profile')
