@@ -1,0 +1,318 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Profile</title>
+
+    <style>
+        #wrapper{
+            width: 100%;
+            height: 800px;
+            background-color: cadetblue;
+        }
+        .sidebar {
+            margin: 0;
+            padding: 0;
+            width: 15%;
+            background-color: rgb(98, 154, 218);
+            position: fixed;
+            height: 800px;
+            overflow: auto;
+        }
+
+        #else {
+            width: 85%;
+            background-color: rgb(172, 207, 240);
+            height: 800px;
+            float: right;
+            background-image: url('{% static "images/mana.png" %}');
+            background-position: right;
+        }
+
+            .sidebar a {
+            display: block;
+            color: black;
+            font-size: 22px;
+            padding: 16px;
+            text-decoration: none;
+            border: 1px solid rgb(170, 170, 170)
+        }
+            
+            .sidebar a.active {
+            background-color: rgb(3, 52, 109);
+            color: white;
+        }
+
+            .sidebar a:hover:not(.active) {
+            background-color:rgb(3, 52, 109);
+
+            color: white;
+        }
+
+        #search {
+            width: 100%;
+            height: 100px;
+            text-align: right;
+            padding: 30px;
+            box-sizing: border-box;
+        }
+        input[type=text] {
+            width: 30%;
+            height: 15px;
+            padding: 7px;
+            font-size: larger;
+        }
+        input[type=submit] {
+            height: 25px;
+            margin-left: 10px;
+            width: 10%;
+            font-size: 15px;
+            background-color: rgb(3, 52, 109);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            }
+
+        input[type=submit]:hover {
+            background-color: rgb(122, 135, 237);
+            }
+        
+        label {
+            display: none;
+        }
+
+        .details {
+            width: 100%; 
+            height: 55px; 
+            font-size: 20px;
+        }
+
+        .icons {
+            width: 8%; 
+            margin-right: 7px;
+        }
+
+        .weather-img {
+            width: 80%; 
+            float: right;
+        }
+
+        #error {
+            width: 60%; 
+            height: 500px; 
+            background-color: aquamarine; 
+            margin-left: 100px; 
+            background-image: url('{% static "images/4044.jpeg" %}');
+            background-position: center;
+        }
+
+        #history {
+            width: 50%;
+            height: 500px;
+            margin-left: 100px;
+
+        }
+        table {
+            font-family: arial, sans-serif;
+            border: 1px solid rgb(230, 213, 213);
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 50px;
+            border: 1px solid black;
+        } 
+        
+        td, th {
+            text-align: left;
+            padding: 8px;
+        }
+
+        table tr:nth-child(even){
+            background-color: #b3c5f5;
+        }
+
+        table tr:nth-child(odd){
+            background-color: rgb(203, 221, 241);
+        }
+
+        #button {
+            text-align: center;
+            height: 100px;
+            padding-top: 50px;
+        }
+
+        #button a {
+            text-decoration: none;
+            display: inline-block;
+            padding: 8px 16px;
+        }
+
+        #button a:hover {
+            background-color: rgb(122, 135, 237);
+            color: black;
+        }
+
+        .previous {
+            background-color: rgb(3, 52, 109);  
+            color: white;
+            margin-right: 10px;
+        }
+
+        .next {
+            background-color: rgb(3, 52, 109);
+            color: white;
+            width: 70px;
+            margin-left: 10px;
+        }
+
+
+
+    </style>
+</head>
+<body>
+    <div id='wrapper'>
+        <div class="sidebar">
+            <a class="active" href="#home">{{user.username}}</a>
+            <a href="{% url 'weather:edit' user.pk %}">Profile</a>
+            <a href="{% url 'weather:history' user.pk %}">History</a>
+            <a href="{% url 'weather:logout' %}">Log out</a>
+            <img style="width: 80%; margin-top: 270px; margin-left: 10%;" src="{% static 'images/weather.png' %}">
+        </div>
+        <div id='else'>
+            <div id="search">
+                <form method="post" action="{% url 'weather:profile' %}">
+                    {% csrf_token %}
+                    <div>{{form.as_p}}</div>
+                    <input type="submit" value="Search">
+                </form>    
+            </div>
+
+                {% if error %}
+                    <div id='error'></div>
+                {% elif history %}
+                    <div id="history">
+                        <div style=" width: 100%; height: 380px;">
+                        <table>
+                            <tr>
+                                <th>City</th>
+                                <th>Searched at</th>
+                              </tr>
+                            {% for city in object_list %}
+                                <tr>
+                                    <td>{{city.name}}</td>
+                                    <td>{{city.searched_at}}</td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                            </div>
+                        <div id="button">
+
+                            {% if page_obj.has_previous %}
+                                <a href="?page={{ page_obj.previous_page_number }}" class="previous">&laquo; Previous</a>
+                            {% endif %}
+                    
+                            <span>
+                                page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                            </span>
+                    
+                            {% if page_obj.has_next %}
+                                <a href="?page={{ page_obj.next_page_number }}" class="next">Next &raquo;</a>
+                            {% endif %}
+                        </div>
+                    
+
+                    </div>
+
+                {% else %}
+                
+                <div style="width: 20%; height: 100px; float: left; text-align: center; font-size: 60px; margin-top: 30px; padding: 5px; box-sizing: border-box; margin-left: 50px;">
+                    {{name}}
+               </div>
+               <div style="width: 20%; height: 80px; float: left; margin-left: 60px; margin-top: 70px; font-size: 30px;">
+                   {{temperature}}°C
+                   <img style="width: 25%;" src="{% static 'images/warm.png' %}">
+                   
+                   <br/>
+                   <span style="font-size: 18px;"> feels like {{feels_like | title}}°C</span>
+               </div>
+               <div style="width: 20%; height: 185px; float: left; margin-top: 25px; font-size: 22px; margin-left: 30px;">
+                       
+                   <div style="width: 100%; height: 135px;">
+   
+                       {% if 'rain' in description %}
+                           <img class="weather-img" src="{% static 'images/rainy.png' %}">
+                       {% endif %}
+                       {% if 'cloud' in description %}
+                           <img class="weather-img" src="{% static 'images/cloudy.png' %}">
+                       {% endif %}
+                       {% if 'sun' in description %}
+                           <img class="weather-img" src="{% static 'images/sunny.png' %}">
+                       {% endif %}
+                       {% if 'snow' in description %}
+                           <img class="weather-img" src="{% static 'images/snowy.png' %}">
+                       {% endif %}
+                       {% if 'clear' in description %}
+                           <img class="weather-img" src="{% static 'images/clear-sky.png' %}">
+                       {% endif %}
+                       {% if 'mist' in description %}
+                           <img class="weather-img" src="{% static 'images/mist.png' %}">
+                       {% endif %}
+                       {% if 'haze' in description %}
+                           <img class="weather-img" src="{% static 'images/haze.png' %}">
+                       {% endif %}
+                       {% if 'smoke' in description %}
+                           <img class="weather-img" src="{% static 'images/smoke.png' %}">
+                       {% endif %}
+                       {% if 'dust' in description %}
+                           <img class="weather-img" src="{% static 'images/dust.png' %}">
+                       {% endif %}
+                   </div>
+                   <div style="width: 100%; height: 50px; padding-top: 10px; padding-left: 20px;">
+                       {{description | title}}
+                   </div>                      
+               </div>
+   
+               <div style="width: 40%; height: 400px;margin-left: 10%; margin-top: 200px;">
+                   <div class="details">
+                       <div style="float: right;"><img  class="icons" src="{% static 'images/countries.png' %}">
+                           Country: {{country}}
+                       </div>
+                       
+                   </div>
+                   <div class="details">
+                       <div style="float: right;"><img  class="icons" src="{% static 'images/pressure.png' %}">
+                           Pressure: {{pressure}} hPa
+                       </div>
+                       
+                   </div>
+                   <div class="details">
+                       <div style="float: right;"><img  class="icons" src="{% static 'images/humidity.png' %}">
+                           Humidity: {{humidity}}%
+                       </div>
+                   </div>
+                   <div class="details">
+                       <div style="float: right;"><img  class="icons" src="{% static 'images/sunrise.png' %}">
+                           Sunrise: {{sunrise}}
+                       </div>
+                       
+                   </div>
+                   <div class="details">
+                       <div style="float: right;"><img  class="icons" src="{% static 'images/sunset.png' %}">
+                           Sunset: {{sunset}}
+                       </div>
+                       
+                   </div>
+                   <div class="details">
+                       <div style="float: right;"><img  style="width: 7%; margin-right: 7px;" src="{% static 'images/windy.png' %}">
+                           Windspeed: {{windspeed}} m/s NW
+                       </div>
+
+                    </div>
+            </div>
+            {% endif %}
+    </div>  
+    </div>
+</body>
+</html>

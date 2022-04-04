@@ -1,0 +1,213 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Weather</title>
+
+    <style>
+
+        #container {
+            width: 95%;
+            height: 700px;
+            margin: auto;
+        }
+        #left {
+            background-color: rgb(43, 116, 184);
+            width: 35%;
+            height: 700px;
+            float: right;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        #right {
+            width: 65%;
+            height: 700px;
+            padding: 20px;
+            box-sizing: border-box;
+            background-image: url('{% static "images/tehrann.jpg" %}');
+            background-position: right;
+        }
+        
+        input[type=text], input[type=password], select {
+            width: 92%;
+            height: 30px;
+            padding: 12px 20px;
+            margin-bottom: 10px;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            -webkit-transition: 0.5s;
+            transition: 0.5s;
+            outline: none;
+            box-sizing: border-box;
+            
+            }
+
+        input[type=text], input[type=password]:focus {
+            border: 2px solid #555;
+            }
+
+        input[type=submit], input[type=button] {
+            width: 20%;
+            height: 30px;
+            font-size: 15px;
+            background-color: rgb(3, 52, 109);
+            color: white;
+            margin-top: 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            }
+
+        input[type=submit]:hover {
+            background-color: rgb(9, 20, 100);
+            }
+        
+        li{
+                color: rgb(61, 60, 59);
+            }
+            
+        span{
+            color: rgb(61, 60, 59);
+        }
+
+        label{
+            font-size: 20px;
+        }
+
+        .details {
+            width: 100%; 
+            height: 55px; 
+            font-size: 20px;
+        }
+
+        .icons {
+            width: 8%; 
+            margin-right: 7px;
+        }
+
+        .weather-img {
+            width: 80%; 
+            float: right;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id='container'>
+        <div id='left'>
+            {% if res %}
+                <h2>Login</h2>
+            {% else %}
+                <h2>Sign Up</h2>
+            {% endif %}
+            <form method="post">
+                {% csrf_token %}
+                {{form.as_p}}
+                {% if res %}
+                Don't have an account? <a href="{% url 'weather:signup' %}">sign up</a> first!
+                <input type="submit" value="login" style="margin-left: 55%;">   
+                {% else %}
+                Have an account? <a href="{% url 'weather:login' %}">login</a><br/>
+                <input type="submit", value="submit" >
+                {% endif %}
+
+            </form>
+        </div>
+        <div id='right'>
+
+            <div style="width: 20%; height: 100px; float: left; text-align: center; font-size: 60px; margin-top: 30px; padding: 5px; box-sizing: border-box;">
+                 {{name}}
+            </div>
+            <div style="width: 20%; height: 80px; float: left; margin-left: 60px; margin-top: 70px; font-size: 30px;">
+                {{temperature}} °C
+                <img style="width: 25%;" src="{% static 'images/warm.png' %}">
+                
+                <br/>
+                <span style="font-size: 18px;"> feels like {{feels_like | title}}°C</span>
+            </div>
+            <div style="width: 20%; height: 185px; float: left; margin-top: 25px; font-size: 22px; margin-left: 30px;">
+                    
+                <div style="width: 100%; height: 135px;">
+
+                    {% if 'rain' in description %}
+                        <img class="weather-img" src="{% static 'images/rainy.png' %}">
+                    {% endif %}
+                    {% if 'cloud' in description %}
+                        <img class="weather-img" src="{% static 'images/cloudy.png' %}">
+                    {% endif %}
+                    {% if 'sun' in description %}
+                        <img class="weather-img" src="{% static 'images/sunny.png' %}">
+                    {% endif %}
+                    {% if 'snow' in description %}
+                        <img class="weather-img" src="{% static 'images/snowy.png' %}">
+                    {% endif %}
+                    {% if 'clear' in description %}
+                        <img class="weather-img" src="{% static 'images/clear-sky.png' %}">
+                    {% endif %}
+                    {% if 'mist' in description %}
+                        <img class="weather-img" src="{% static 'images/mist.png' %}">
+                    {% endif %}
+                    {% if 'haze' in description %}
+                        <img class="weather-img" src="{% static 'images/haze.png' %}">
+                    {% endif %}
+                    {% if 'smoke' in description %}
+                           <img class="weather-img" src="{% static 'images/smoke.png' %}">
+                    {% endif %}
+                    {% if 'dust' in description %}
+                           <img class="weather-img" src="{% static 'images/dust.png' %}">
+                    {% endif %}
+                </div>
+                <div style="width: 100%; height: 50px; padding-top: 10px; padding-left: 20px;">
+                    {{description | title}}
+                </div>                      
+            </div>
+
+            <div style="width: 40%; height: 400px;margin-left: 10%; margin-top: 200px;">
+                <div class="details">
+                    <div style="float: right;"><img  class="icons" src="{% static 'images/countries.png' %}">
+                        Country: {{country}}
+                    </div>
+                    
+                </div>
+                <div class="details">
+                    <div style="float: right;"><img  class="icons" src="{% static 'images/pressure.png' %}">
+                        Pressure: {{pressure}} hPa
+                    </div>
+                    
+                </div>
+                <div class="details">
+                    <div style="float: right;"><img  class="icons" src="{% static 'images/humidity.png' %}">
+                        Humidity: {{humidity}}%
+                    </div>
+                </div>
+                <div class="details">
+                    <div style="float: right;"><img  class="icons" src="{% static 'images/sunrise.png' %}">
+                        Sunrise: {{sunrise}}
+                    </div>
+                    
+                </div>
+                <div class="details">
+                    <div style="float: right;"><img  class="icons" src="{% static 'images/sunset.png' %}">
+                        Sunset: {{sunset}}
+                    </div>
+                    
+                </div>
+                <div class="details">
+                    <div style="float: right;"><img  style="width: 7%; margin-right: 7px;" src="{% static 'images/windy.png' %}">
+                        Windspeed: {{windspeed}} m/s NW
+                    </div>
+                    
+                </div>
+            </div> 
+
+
+
+        </div>
+    </div>
+
+</body>
+</html>
