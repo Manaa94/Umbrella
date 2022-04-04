@@ -1,10 +1,11 @@
 from django.urls import reverse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from weather.models import City
 from django.views.generic import View
 from django.contrib.auth.views import LoginView
 from django.views.generic import CreateView
 from weather.forms import SignUpForm, CityForm
+from django.contrib.auth import logout
 from .utils import get_data
 from dotenv import load_dotenv
 
@@ -36,9 +37,10 @@ class LoginUserView(LoginView):
             context[key] = value
         return context
 
+
 class ProfileView(View):
 
-    def get(self,request):
+    def get(self, request):
         context = {'form': CityForm()}
         for key, value in get_data('tehran').items():
             context[key] = value
@@ -60,3 +62,9 @@ class ProfileView(View):
             except:
                 context['error'] = 'error'
         return render(request, 'profile.html', context)
+
+
+class LogoutUserView(View):
+    def get(self, request):
+        logout(request)
+        return redirect('weather:login')
