@@ -5,6 +5,7 @@ This is an application for weather reporting. By registering in this app, the us
 * Django4
 * Html5
 * Css
+* Postgresql
 # Installation
 
 **1. clone the project**
